@@ -4,8 +4,13 @@ use tracing::error;
 
 mod llm;
 mod commands;
+mod config;
+mod history;
+mod error_capture;
 
 use commands::CommandGenerator;
+use config::ConfigManager;
+use history::HistoryManager;
 
 #[derive(Parser)]
 #[command(name = "termgenius")]

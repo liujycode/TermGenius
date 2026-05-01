@@ -1,0 +1,71 @@
+# TermGenius 默认配置文件
+# 配置文件路径: ~/.termgenius/config.toml
+
+[model]
+# 模型文件路径
+path = "~/.termgenius/models/qwen1_5-1_8b-chat-q4_0.gguf"
+
+# 上下文大小（token 数量）
+context_size = 2048
+
+# GPU 层数（0 表示仅使用 CPU）
+# 如果有 NVIDIA GPU，可以设置为 20-30 以加速推理
+gpu_layers = 0
+
+# 线程数（0 表示自动检测）
+threads = 0
+
+# 温度参数（0.0-2.0，越高越随机）
+temperature = 0.7
+
+# Top-P 采样（0.0-1.0）
+top_p = 0.9
+
+# Top-K 采样
+top_k = 40
+
+# 最大生成 token 数
+max_tokens = 512
+
+[history]
+# 是否启用历史记录
+enabled = true
+
+# 历史记录文件路径（可选，默认为 ~/.termgenius/history.json）
+# path = "~/.termgenius/history.json"
+
+# 最大历史记录数
+max_entries = 1000
+
+# 是否保存失败的命令
+save_failed = true
+
+[generation]
+# 是否自动执行生成的命令（不推荐）
+auto_execute = false
+
+# 是否显示命令解释
+show_explanation = true
+
+# 是否显示安全警告
+show_safety_warning = true
+
+# 危险命令关键词列表
+dangerous_keywords = [
+    "rm -rf",
+    "format",
+    "del /f",
+    "mkfs",
+    "dd if=",
+    "> /dev/",
+]
+
+[ui]
+# 是否使用彩色输出
+color = true
+
+# 是否使用 emoji
+emoji = true
+
+# 是否显示进度条
+progress_bar = true
