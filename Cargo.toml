@@ -17,8 +17,8 @@ clap = { version = "4.5", features = ["derive", "cargo"] }
 ratatui = "0.26"
 crossterm = "0.27"
 
-# LLM 推理（待添加 llama-cpp-rs）
-# llama-cpp-rs = "0.1"
+# LLM 推理
+llama-cpp-2 = "0.1.77"
 
 # 异步运行时
 tokio = { version = "1.36", features = ["full"] }
@@ -42,6 +42,9 @@ thiserror = "1.0"
 # 配置管理
 config = "0.14"
 dirs = "5.0"
+
+# 系统信息
+num_cpus = "1.16"
 
 [dev-dependencies]
 # 测试
