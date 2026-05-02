@@ -364,7 +364,7 @@ af02880 (HEAD -> master) feat: 添加终端集成脚本
 ## 联系方式
 
 - **作者**: liujycode
-- **Email**: liujycode@gmail.com
+- **Email**: liujiye36@gmail.com
 - **GitHub**: https://github.com/liujycode/TermGenius
 
 ---
