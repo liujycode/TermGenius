@@ -15,7 +15,7 @@ use error_capture::ErrorAnalyzer;
 
 #[derive(Parser)]
 #[command(name = "termgenius")]
-#[command(author = "liujycode <liujiye36@gmail.com>")]
+#[command(author = "liujycode <liujycode@foxmail.com>")]
 #[command(version = "0.1.0")]
 #[command(about = "本地离线 AI 终端助手", long_about = None)]
 struct Cli {

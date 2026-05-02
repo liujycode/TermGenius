@@ -258,7 +258,7 @@ Set-Alias tg termgenius
 ## 📮 联系方式
 
 - GitHub Issues: [提交问题](https://github.com/liujycode/TermGenius/issues)
-- Email: liujiye36@gmail.com
+- Email: liujycode@foxmail.com
 
 ---
 

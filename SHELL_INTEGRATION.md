@@ -318,7 +318,7 @@ Remove-Item $HOME\.termgenius\shell-integration.ps1
 如果你有改进建议或发现问题，请：
 
 - 提交 Issue: https://github.com/liujycode/TermGenius/issues
-- 或发送邮件: liujiye36@gmail.com
+- 或发送邮件: liujycode@foxmail.com
 
 ---
 

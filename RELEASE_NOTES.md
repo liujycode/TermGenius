@@ -155,7 +155,7 @@ termgenius history
 ## 📧 联系方式
 
 - **作者**: liujycode
-- **Email**: liujiye36@gmail.com
+- **Email**: liujycode@foxmail.com
 - **GitHub**: https://github.com/liujycode/TermGenius
 
 ---

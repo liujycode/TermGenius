@@ -2,7 +2,7 @@
 name = "termgenius"
 version = "0.1.0"
 edition = "2021"
-authors = ["liujycode <liujiye36@gmail.com>"]
+authors = ["liujycode <liujycode@foxmail.com>"]
 description = "本地离线 AI 终端助手 - 让终端操作更智能"
 license = "MIT"
 repository = "https://github.com/liujycode/TermGenius"
