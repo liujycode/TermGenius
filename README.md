@@ -2,13 +2,10 @@
 
 <div align="center">
 
-![TermGenius Logo](docs/assets/logo.png)
-
-**让终端操作更智能 | 100% 本地运行 | 零配置开箱即用**
+**让终端操作更智能 | 支持多种 LLM 引擎 | 灵活部署**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Rust](https://img.shields.io/badge/Rust-1.75+-orange.svg)](https://www.rust-lang.org/)
-[![GitHub Stars](https://img.shields.io/github/stars/liujycode/TermGenius?style=social)](https://github.com/liujycode/TermGenius)
+[![Rust](https://img.shields.io/badge/Rust-1.95+-orange.svg)](https://www.rust-lang.org/)
 
 [English](README.md) | [简体中文](README_zh.md)
 
@@ -18,29 +15,55 @@
 
 - 🧠 **AI 驱动**：自然语言转命令，告别记忆复杂参数
 - 🔧 **智能修复**：命令报错自动诊断并提供修复方案
-- 💻 **编程辅助**：终端内直接生成 Python/Go/Shell 脚本
-- 🔒 **隐私优先**：100% 本地运行，代码和数据不上传
-- ⚡ **零配置**：一键安装，自动下载模型，开箱即用
-- 🌍 **全平台**：支持 Linux/macOS/Windows + bash/zsh/fish/PowerShell
+- 💻 **代码生成**：终端内直接生成 Python/Shell/其他脚本
+- 🔒 **隐私优先**：支持本地部署，数据不上传
+- 🎯 **多引擎支持**：
+  - Ollama API（推荐）
+  - llama.cpp server
+  - Mock 引擎（测试）
+- ⚡ **高性能**：Rust 编写，启动快速，资源占用低
+- 🌍 **全平台**：支持 Linux/macOS/Windows + bash/zsh/PowerShell
 
 ## 📦 快速开始
 
-### 一键安装
+### 安装
 
-**Linux / macOS**:
-```bash
-curl -fsSL https://raw.githubusercontent.com/liujycode/TermGenius/main/scripts/install.sh | bash
-```
-
-**Windows (PowerShell)**:
-```powershell
-irm https://raw.githubusercontent.com/liujycode/TermGenius/main/scripts/install.ps1 | iex
-```
-
-### 验证安装
+#### 从源码编译
 
 ```bash
-tg --version
+# 克隆仓库
+git clone https://github.com/liujycode/TermGenius.git
+cd TermGenius
+
+# 编译（需要 Rust 1.95+）
+cargo build --release
+
+# 安装到系统
+cargo install --path .
+```
+
+### 配置 LLM 引擎
+
+#### 使用 Ollama（推荐）
+
+```bash
+# 1. 安装 Ollama
+# 访问 https://ollama.ai 下载安装
+
+# 2. 下载模型
+ollama pull qwen2.5:1.5b
+
+# 3. 启动 Ollama 服务（通常会自动启动）
+ollama serve
+```
+
+编辑配置文件 `~/.termgenius/config.toml`：
+
+```toml
+[model]
+engine_type = "ollama"
+api_url = "http://localhost:11434"
+model_name = "qwen2.5:1.5b"
 ```
 
 ### 第一个命令
@@ -48,73 +71,168 @@ tg --version
 ```bash
 # 自然语言生成命令
 tg "列出所有大于100MB的文件"
+# 输出: find . -type f -size +100M
 
-# 输出：
-# [绿色] find . -type f -size +100M
-# [灰色] 在当前目录递归查找所有大于100MB的文件
-# [Enter 执行] [Ctrl+E 编辑] [Esc 取消]
+# 生成代码
+tg code "写一个Python脚本批量重命名文件"
+
+# 查看配置
+tg config --show
 ```
 
 ## 🎯 使用场景
 
 ### 命令生成
 ```bash
-tg "查找7天前修改的日志文件并删除"
-# → find /var/log -name "*.log" -mtime +7 -delete
+tg "查找7天前修改的日志文件"
+# → find /var/log -name "*.log" -mtime +7
+
+tg "查看占用端口8080的进程"
+# → lsof -i :8080  (Linux/macOS)
+# → netstat -ano | findstr :8080  (Windows)
 ```
 
-### 错误修复
+### 命令修复
 ```bash
+# 执行失败的命令会被记录
 $ rm /root/test.txt
 # Permission denied
 
-# TermGenius 自动弹出：
-# [红色] 错误：权限不足
-# [绿色] 建议：sudo rm /root/test.txt
-# [Enter 执行修复]
+# 使用 fix 命令修复
+tg fix
+# → 分析错误类型
+# → 提供修复建议: sudo rm /root/test.txt
 ```
 
-### 编程辅助
+### 代码生成
 ```bash
 tg code "写一个Python脚本批量重命名文件"
 # → 生成完整的 Python 脚本 + 使用说明
+
+tg code "Shell脚本备份数据库"
+# → 生成 Shell 脚本
 ```
 
-## 📖 文档
+### 历史记录
+```bash
+# 查看历史
+tg history
 
-- [安装指南](docs/installation.md)
-- [使用教程](docs/usage.md)
-- [常见问题](docs/faq.md)
-- [架构设计](docs/architecture.md)
-- [贡献指南](CONTRIBUTING.md)
+# 搜索历史
+tg history --search "git"
 
-## 🛠️ 技术栈
+# 清空历史
+tg history --clear
+```
 
-- **语言**: Rust
-- **LLM 引擎**: llama.cpp
-- **模型**: Qwen 1.8B / DeepSeek-Coder 1.3B
-- **终端 UI**: Ratatui
-- **跨平台**: 单二进制，无依赖
+## 📖 命令参考
 
-## 🌟 为什么选择 TermGenius？
+| 命令 | 说明 | 示例 |
+|------|------|------|
+| `tg "描述"` | 生成 Shell 命令 | `tg "删除 7 天前的日志文件"` |
+| `tg code "需求"` | 生成代码或脚本 | `tg code "Python 读取 CSV 文件"` |
+| `tg fix` | 修复上一个失败的命令 | `tg fix` |
+| `tg history` | 查看命令历史 | `tg history` |
+| `tg history --search <关键词>` | 搜索历史记录 | `tg history --search git` |
+| `tg history --clear` | 清空历史记录 | `tg history --clear` |
+| `tg config --show` | 显示当前配置 | `tg config --show` |
+| `tg uninstall` | 卸载指南 | `tg uninstall` |
 
-| 特性 | TermGenius | GitHub Copilot CLI | Warp Terminal | tldr |
-|------|-----------|-------------------|---------------|------|
-| 本地离线 | ✅ | ❌ | ❌ | ✅ |
-| AI 能力 | ✅ | ✅ | ✅ | ❌ |
-| 编程辅助 | ✅ | ⚠️ | ❌ | ❌ |
-| 零配置 | ✅ | ✅ | ✅ | ✅ |
-| 全平台 | ✅ | ✅ | ⚠️ | ✅ |
-| 价格 | 免费 | $10/月 | 部分免费 | 免费 |
+## 🛠️ 配置文件
+
+配置文件位于 `~/.termgenius/config.toml`：
+
+```toml
+[model]
+# 引擎类型: mock, ollama, llama_cpp
+engine_type = "ollama"
+# API 地址（用于 HTTP API 引擎）
+api_url = "http://localhost:11434"
+# 模型名称（用于 HTTP API 引擎）
+model_name = "qwen2.5:1.5b"
+# 温度参数（0.0-1.0，越高越随机）
+temperature = 0.7
+# 最大生成 token 数
+max_tokens = 512
+
+[history]
+# 是否启用历史记录
+enabled = true
+# 最大历史记录数
+max_entries = 1000
+
+[generation]
+# 是否自动执行生成的命令（危险！）
+auto_execute = false
+# 是否显示命令解释
+show_explanation = true
+# 是否显示安全警告
+show_safety_warning = true
+
+[ui]
+# 是否使用彩色输出
+color = true
+# 是否使用 emoji
+emoji = true
+```
+
+## 🔧 高级用法
+
+### 使用 llama.cpp server
+
+```bash
+# 1. 启动 llama.cpp server
+./llama-server -m models/qwen-1.5b-q4.gguf --port 8080
+
+# 2. 配置 TermGenius
+# 编辑 ~/.termgenius/config.toml
+[model]
+engine_type = "llama_cpp"
+api_url = "http://localhost:8080"
+```
+
+### 终端集成
+
+#### Bash/Zsh
+
+在 `~/.bashrc` 或 `~/.zshrc` 中添加：
+
+```bash
+# TermGenius 别名
+alias tg='termgenius'
+```
+
+#### PowerShell
+
+在 PowerShell 配置文件中添加：
+
+```powershell
+# TermGenius 别名
+Set-Alias tg termgenius
+```
+
+## 🌟 技术栈
+
+- **语言**: Rust 1.95+
+- **LLM 引擎**: 
+  - Ollama API
+  - llama.cpp server
+  - Mock 引擎（测试）
+- **HTTP 客户端**: reqwest
+- **终端 UI**: Ratatui + Crossterm
+- **配置管理**: TOML
+- **历史记录**: JSON
 
 ## 🗺️ Roadmap
 
 - [x] MVP 版本（命令生成 + 错误修复）
-- [ ] 编程辅助（Python/Go/Shell）
-- [ ] 命令历史学习
+- [x] 多引擎支持（Ollama + llama.cpp）
+- [x] 历史记录管理
+- [x] 配置管理
+- [ ] 终端集成脚本
+- [ ] 自动补全支持
 - [ ] 桌面版（Tauri）
 - [ ] VS Code 插件
-- [ ] 企业版（批量部署 + 权限管理）
 
 ## 🤝 贡献
 
@@ -126,19 +244,18 @@ tg code "写一个Python脚本批量重命名文件"
 4. 推送到分支 (`git push origin feature/AmazingFeature`)
 5. 创建 Pull Request
 
-详见 [贡献指南](CONTRIBUTING.md)
-
 ## 📄 许可证
 
 本项目采用 [MIT License](LICENSE) 开源。
 
 ## 🙏 致谢
 
+- [Ollama](https://ollama.ai) - 简单易用的本地 LLM 运行工具
 - [llama.cpp](https://github.com/ggerganov/llama.cpp) - 高性能 LLM 推理引擎
-- [Qwen](https://github.com/QwenLM/Qwen) - 优秀的开源模型
+- [Qwen](https://github.com/QwenLM/Qwen) - 优秀的开源大语言模型
 - [Ratatui](https://github.com/ratatui-org/ratatui) - 终端 UI 框架
 
-## 📮 联系我们
+## 📮 联系方式
 
 - GitHub Issues: [提交问题](https://github.com/liujycode/TermGenius/issues)
 - Email: liujycode@gmail.com
