@@ -64,11 +64,57 @@ impl CommandGenerator {
         let prompt = self.prompt_builder.build_command_prompt(user_input);
         let output = self.engine.generate(&prompt)?;
 
-        // 清理输出（去除多余空白和换行）
-        let command = output.trim().to_string();
+        // 清理输出
+        let command = self.clean_command_output(&output);
 
         info!("生成的命令: {}", command);
         Ok(command)
+    }
+
+    /// 清理命令输出，去除解释文字
+    fn clean_command_output(&self, output: &str) -> String {
+        let lines: Vec<&str> = output.lines().collect();
+
+        // 如果只有一行，直接返回
+        if lines.len() == 1 {
+            return output.trim().to_string();
+        }
+
+        // 如果有多行，取第一个非空的命令行
+        for line in &lines {
+            let trimmed = line.trim();
+
+            // 跳过空行
+            if trimmed.is_empty() {
+                continue;
+            }
+
+            // 跳过明显的解释文字
+            if trimmed.starts_with("注意：")
+                || trimmed.starts_with("说明：")
+                || trimmed.starts_with("提示：")
+                || trimmed.starts_with("//")
+                || trimmed.starts_with("#")
+                || trimmed.starts_with("可以使用")
+                || trimmed.starts_with("这个命令")
+                || trimmed.contains("实际上并不")
+            {
+                continue;
+            }
+
+            // 返回第一个看起来像命令的行
+            return trimmed.to_string();
+        }
+
+        // 如果都是解释文字，返回第一个非空行
+        for line in &lines {
+            let trimmed = line.trim();
+            if !trimmed.is_empty() {
+                return trimmed.to_string();
+            }
+        }
+
+        output.trim().to_string()
     }
 
     /// 修复失败的命令

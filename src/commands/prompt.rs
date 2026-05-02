@@ -37,20 +37,31 @@ impl PromptBuilder {
         let common_commands = self.get_common_commands();
 
         format!(
-            r#"你是一个专业的终端命令助手。请根据用户的自然语言描述，生成对应的 Shell 命令。
+            r#"你是一个专业的 {} {} 终端命令助手。
 
-系统信息：
+【关键要求】
+你的输出必须是一行可执行的命令，不能包含任何解释、说明、注释或额外文字。
+
+错误示例（不要这样输出）：
+- "dir /s /b *test*  # 这个命令会查找文件"  ❌ 包含注释
+- "可以使用 dir 命令"  ❌ 包含解释
+- "dir\n\n注意：这个命令..."  ❌ 包含说明
+
+正确示例（必须这样输出）：
+- "dir /s /b *test*"  ✅ 只有命令
+
+系统环境：
 - 操作系统: {}
 - Shell: {}
 
-要求：
-1. 只输出命令本身，不要有任何解释或额外文字
-2. 如果需要多个命令，用 && 或 ; 连接
-3. 确保命令在当前系统和 Shell 下可执行
-4. 优先使用常见、安全的命令
-5. 避免危险操作（如 rm -rf /、format 等）
+命令规范：
+1. 只使用 {} 原生命令（Windows 用 dir/forfiles/tasklist 等，Linux 用 ls/find/ps 等）
+2. 不要混用不同操作系统的命令
+3. 如果需要多个操作，用 && 连接
+4. 路径分隔符：{} 使用 {}
+5. 避免危险操作
 
-常用命令参考：
+常用命令：
 {}
 
 示例：
@@ -59,7 +70,16 @@ impl PromptBuilder {
 用户需求：{}
 
 命令："#,
-            self.os, self.shell, common_commands, examples, user_input
+            self.os,
+            self.shell,
+            self.os,
+            self.shell,
+            self.os,
+            self.os,
+            if self.os == "Windows" { "\\" } else { "/" },
+            common_commands,
+            examples,
+            user_input
         )
     }
 
@@ -96,25 +116,71 @@ impl PromptBuilder {
 
     /// 构建代码生成 prompt
     pub fn build_code_prompt(&self, user_input: &str) -> String {
-        format!(
-            r#"你是一个专业的编程助手。请根据用户的需求，生成对应的代码或脚本。
+        let code_examples = self.get_code_examples();
 
-系统信息：
+        format!(
+            r#"你是一个专业的编程助手。请根据用户需求生成高质量的代码。
+
+系统环境：
 - 操作系统: {}
 
-要求：
-1. 输出完整可运行的代码
-2. 包含必要的注释
-3. 遵循最佳实践
-4. 如果是脚本，添加 shebang 行
-5. 代码应该简洁、高效、易读
+【重要】输出要求：
+1. 直接输出完整可运行的代码，不要有额外的解释文字
+2. 代码必须包含必要的注释（中文）
+3. 如果是脚本，必须添加 shebang 行
+4. 代码应该遵循最佳实践
+5. 包含错误处理
+6. 代码风格清晰、易读
+
+代码规范：
+- Python: 使用 PEP 8 风格，添加类型提示
+- Shell: 使用 set -e，添加错误检查
+- JavaScript: 使用 ES6+ 语法
+- 其他语言: 遵循该语言的标准规范
+
+示例：
+{}
 
 用户需求：{}
 
-代码：
+代码（直接输出代码，不要有其他内容）：
 "#,
-            self.os, user_input
+            self.os,
+            code_examples,
+            user_input
         )
+    }
+
+    /// 获取代码示例
+    fn get_code_examples(&self) -> String {
+        r#"用户: "写一个 Python 脚本读取 CSV 文件"
+代码:
+#!/usr/bin/env python3
+import csv
+
+def read_csv(filename):
+    """读取 CSV 文件并返回数据"""
+    with open(filename, 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        return list(reader)
+
+if __name__ == "__main__":
+    data = read_csv('data.csv')
+    print(data)
+
+用户: "写一个 Shell 脚本备份目录"
+代码:
+#!/bin/bash
+set -e
+
+backup_dir() {
+    local src="$1"
+    local dst="$2"
+    tar -czf "${dst}/backup_$(date +%Y%m%d_%H%M%S).tar.gz" "$src"
+    echo "备份完成"
+}
+
+backup_dir "/path/to/source" "/path/to/backup""#.to_string()
     }
 
     /// 获取命令示例
@@ -124,21 +190,39 @@ impl PromptBuilder {
                 r#"用户: "列出当前目录的文件"
 命令: dir
 
+用户: "查找大于 1MB 的文件"
+命令: forfiles /S /C "cmd /c if @fsize gtr 1048576 echo @path"
+
 用户: "查找包含 test 的文件"
 命令: dir /s /b *test*
 
-用户: "删除临时文件"
-命令: del /q %TEMP%\*.tmp"#
+用户: "删除 7 天前的日志文件"
+命令: forfiles /p "C:\logs" /s /m *.log /d -7 /c "cmd /c del @path"
+
+用户: "显示当前目录的磁盘使用情况"
+命令: dir
+
+用户: "查看进程列表"
+命令: tasklist"#
             }
             "macOS" | "Linux" => {
                 r#"用户: "列出当前目录的文件"
 命令: ls -la
 
+用户: "查找大于 1MB 的文件"
+命令: find . -type f -size +1M
+
 用户: "查找包含 test 的文件"
 命令: find . -name "*test*"
 
-用户: "删除临时文件"
-命令: rm -f /tmp/*.tmp"#
+用户: "删除 7 天前的日志文件"
+命令: find /var/log -name "*.log" -mtime +7 -delete
+
+用户: "显示当前目录的磁盘使用情况"
+命令: du -sh *
+
+用户: "查看进程列表"
+命令: ps aux"#
             }
             _ => ""
         }.to_string()
