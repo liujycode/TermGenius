@@ -2,7 +2,7 @@
 
 #[cfg(test)]
 mod tests {
-    use crate::llm::{LLMConfig, LLMEngine};
+    use crate::llm::LLMConfig;
     use std::path::PathBuf;
 
     #[test]
@@ -27,13 +27,13 @@ mod tests {
 
     #[test]
     #[ignore] // 需要实际模型文件
-    fn test_llm_engine_creation() {
-        let config = LLMConfig::new(PathBuf::from("models/test.gguf"));
-        let result = LLMEngine::new(config);
+    fn test_mock_engine_creation() {
+        use crate::llm::MockLLMEngine;
 
-        // 如果模型文件不存在，应该返回错误
-        if result.is_err() {
-            println!("预期的错误: 模型文件不存在");
-        }
+        let config = LLMConfig::new(PathBuf::from("models/test.gguf"));
+        let result = MockLLMEngine::new(config);
+
+        // Mock 引擎应该总是成功创建
+        assert!(result.is_ok());
     }
 }

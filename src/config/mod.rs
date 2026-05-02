@@ -5,5 +5,8 @@
 pub mod manager;
 pub mod schema;
 
+#[cfg(test)]
+mod tests;
+
 pub use manager::ConfigManager;
 pub use schema::Config;

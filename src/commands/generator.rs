@@ -116,15 +116,35 @@ impl CommandGenerator {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
+    use crate::config::Config;
 
     #[test]
-    #[ignore] // 需要实际模型文件
-    fn test_command_generator() {
-        let model_path = PathBuf::from("models/test.gguf");
-        let mut generator = CommandGenerator::new(model_path).unwrap();
+    fn test_command_generator_creation() {
+        let config = Config::default();
+        let generator = CommandGenerator::from_config(&config);
 
-        let command = generator.generate_command("列出当前目录").unwrap();
+        // Mock 引擎应该总是成功创建
+        assert!(generator.is_ok());
+    }
+
+    #[test]
+    fn test_command_generation_with_mock() {
+        let config = Config::default();
+        let mut generator = CommandGenerator::from_config(&config).unwrap();
+
+        let command = generator.generate_command("列出当前目录的所有文件").unwrap();
         assert!(!command.is_empty());
+        // Mock 引擎应该返回 "ls -la"
+        assert_eq!(command, "ls -la");
+    }
+
+    #[test]
+    fn test_code_generation_with_mock() {
+        let config = Config::default();
+        let mut generator = CommandGenerator::from_config(&config).unwrap();
+
+        let code = generator.generate_code("写一个 Python 脚本批量重命名文件").unwrap();
+        assert!(!code.is_empty());
+        assert!(code.contains("python"));
     }
 }

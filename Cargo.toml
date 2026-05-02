@@ -9,6 +9,14 @@ repository = "https://github.com/liujycode/TermGenius"
 keywords = ["ai", "terminal", "cli", "llm", "local"]
 categories = ["command-line-utilities", "development-tools"]
 
+[lib]
+name = "termgenius"
+path = "src/lib.rs"
+
+[[bin]]
+name = "termgenius"
+path = "src/main.rs"
+
 [dependencies]
 # CLI 框架
 clap = { version = "4.5", features = ["derive", "cargo"] }

@@ -12,6 +12,9 @@ pub mod error;
 #[cfg(test)]
 mod tests;
 
+#[cfg(test)]
+mod mock_tests;
+
 // 导出所有引擎
 pub use mock_engine::MockLLMEngine;
 pub use http_engine::{HttpLLMEngine, ApiType};
