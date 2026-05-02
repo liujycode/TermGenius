@@ -161,7 +161,7 @@ impl ExecutionResult {
             result.push('\n');
         }
 
-        result.push_str(&format!("\n耗时:  ms", self.execution_time));
+        result.push_str(&format!("\n耗时: {} ms", self.execution_time));
 
         if let Some(code) = self.exit_code {
             result.push_str(&format!("\n退出码: {}", code));

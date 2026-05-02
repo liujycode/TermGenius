@@ -17,8 +17,8 @@ clap = { version = "4.5", features = ["derive", "cargo"] }
 ratatui = "0.26"
 crossterm = "0.27"
 
-# LLM 推理
-llama-cpp-2 = "0.1.77"
+# LLM 推理 (暂时注释，使用模拟引擎)
+# llama-cpp-2 = "0.1.77"
 
 # 异步运行时
 tokio = { version = "1.36", features = ["full"] }
@@ -54,9 +54,9 @@ num_cpus = "1.16"
 # 测试
 criterion = "0.5"
 
-[[bench]]
-name = "llm_benchmark"
-harness = false
+# [[bench]]
+# name = "llm_benchmark"
+# harness = false
 
 [profile.release]
 opt-level = 3

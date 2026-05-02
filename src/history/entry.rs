@@ -125,7 +125,7 @@ impl HistoryEntry {
         );
 
         if let Some(error) = &self.error_message {
-            result.push_str(&format!("\n  错误: ", error));
+            result.push_str(&format!("\n  错误: {}", error));
         }
 
         if let Some(time) = self.execution_time {

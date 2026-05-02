@@ -13,6 +13,11 @@ pub struct ConfigManager {
 }
 
 impl ConfigManager {
+    /// 创建新的配置管理器（别名 load）
+    pub fn new() -> Result<Self> {
+        Self::load()
+    }
+
     /// 加载配置
     pub fn load() -> Result<Self> {
         let config_path = Self::get_config_path()?;
@@ -82,6 +87,11 @@ impl ConfigManager {
         &mut self.config
     }
 
+    /// 获取模型路径
+    pub fn get_model_path(&self) -> PathBuf {
+        self.config.model.path.clone()
+    }
+
     /// 获取配置文件路径
     fn get_config_path() -> Result<PathBuf> {
         // 优先从环境变量读取
@@ -140,7 +150,7 @@ impl ConfigManager {
 
 UI:
   彩色输出: {}
-  Emoji:
+  Emoji: {}
   进度条: {}
 
 配置文件: {}"#,

@@ -15,6 +15,27 @@ pub struct HistoryManager {
 }
 
 impl HistoryManager {
+    /// 创建新的历史记录管理器（使用默认路径）
+    pub fn new() -> Result<Self> {
+        let history_path = Self::get_default_history_path()?;
+        Self::load(history_path, 1000) // 默认最多保存 1000 条
+    }
+
+    /// 获取默认历史记录路径
+    fn get_default_history_path() -> Result<PathBuf> {
+        let home = dirs::home_dir()
+            .context("无法获取用户主目录")?;
+        let history_dir = home.join(".termgenius");
+
+        // 确保目录存在
+        if !history_dir.exists() {
+            fs::create_dir_all(&history_dir)
+                .context("无法创建历史记录目录")?;
+        }
+
+        Ok(history_dir.join("history.json"))
+    }
+
     /// 加载历史记录
     pub fn load(history_path: PathBuf, max_entries: usize) -> Result<Self> {
         let entries = if history_path.exists() {
@@ -126,6 +147,15 @@ impl HistoryManager {
             .find(|e| e.status == CommandStatus::Failed)
     }
 
+    /// 获取失败的命令（最近 N 条）
+    pub fn get_failed_commands(&self, count: usize) -> Vec<&HistoryEntry> {
+        self.entries.iter()
+            .rev()
+            .filter(|e| e.status == CommandStatus::Failed)
+            .take(count)
+            .collect()
+    }
+
     /// 搜索历史记录
     pub fn search(&self, query: &str) -> Vec<&HistoryEntry> {
         self.entries.iter()
@@ -146,15 +176,9 @@ impl HistoryManager {
     /// 获取统计信息
     pub fn stats(&self) -> HistoryStats {
         let total = self.entries.len();
-        let success = self.entries.iter()
-            .filter(|e| e.status == CommandStatus::Success)
-            .count();
-        let failed = self.entries.iter()
-            .filter(|e| e.status == CommandStatus::Failed)
-            .count();
-        let not_executed = self.entries.iter()
-            .filter(|e| e.status == CommandStatus::NotExecuted)
-            .count();
+        let success = self.entries.iter().filter(|e| e.status == CommandStatus::Success).count();
+        let failed = self.entries.iter().filter(|e| e.status == CommandStatus::Failed).count();
+        let not_executed = self.entries.iter().filter(|e| e.status == CommandStatus::NotExecuted).count();
 
         HistoryStats {
             total,
@@ -162,6 +186,11 @@ impl HistoryManager {
             failed,
             not_executed,
         }
+    }
+
+    /// 获取统计信息（别名）
+    pub fn get_statistics(&self) -> HistoryStats {
+        self.stats()
     }
 
     /// 显示历史记录
