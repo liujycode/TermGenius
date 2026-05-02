@@ -1,6 +1,5 @@
 //! 错误分析器
 
-use std::collections::HashMap;
 
 /// 错误类型
 #[derive(Debug, Clone, PartialEq, Eq)]

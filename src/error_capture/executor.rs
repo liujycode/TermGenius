@@ -2,7 +2,7 @@
 
 use anyhow::{Context, Result};
 use std::process::{Command, Output};
-use std::time::{Duration, Instant};
+use std::time::Instant;
 use tracing::{debug, info};
 
 /// 命令执行结果

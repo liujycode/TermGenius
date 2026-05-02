@@ -11,7 +11,7 @@ mod error_capture;
 use commands::CommandGenerator;
 use config::ConfigManager;
 use history::HistoryManager;
-use error_capture::{ErrorAnalyzer, CommandExecutor};
+use error_capture::ErrorAnalyzer;
 
 #[derive(Parser)]
 #[command(name = "termgenius")]

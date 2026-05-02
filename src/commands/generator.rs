@@ -70,7 +70,7 @@ impl CommandGenerator {
         let prompt = self.prompt_builder.build_code_prompt(user_input);
 
         // 代码生成需要更多 tokens
-        let original_max_tokens = self.engine.config().max_tokens;
+        let _original_max_tokens = self.engine.config().max_tokens;
         // TODO: 支持动态修改 max_tokens
 
         let output = self.engine.generate(&prompt)?;
