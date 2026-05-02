@@ -126,9 +126,7 @@ fn main() {
 fn handle_command_generation(config_manager: &ConfigManager, prompt: &str) {
     println!("🤖 正在生成命令...");
 
-    let model_path = config_manager.get_model_path();
-
-    match CommandGenerator::new(model_path.clone()) {
+    match CommandGenerator::from_config(config_manager.config()) {
         Ok(mut generator) => {
             match generator.generate_command(prompt) {
                 Ok(command) => {
@@ -159,9 +157,9 @@ fn handle_command_generation(config_manager: &ConfigManager, prompt: &str) {
             error!("初始化失败: {}", e);
             println!("❌ 初始化失败: {}", e);
             println!("\n💡 提示:");
-            println!("   1. 请确保已下载模型文件");
-            println!("   2. 模型路径: {}", model_path.display());
-            println!("   3. 可通过 tg config --model <路径> 设置模型路径");
+            println!("   1. 检查配置文件中的引擎类型设置");
+            println!("   2. 如果使用 Ollama，确保服务已启动");
+            println!("   3. 可通过 tg config --show 查看当前配置");
         }
     }
 }
@@ -170,9 +168,7 @@ fn handle_command_generation(config_manager: &ConfigManager, prompt: &str) {
 fn handle_code_generation(config_manager: &ConfigManager, prompt: &str) {
     println!("🤖 正在生成代码...");
 
-    let model_path = config_manager.get_model_path();
-
-    match CommandGenerator::new(model_path.clone()) {
+    match CommandGenerator::from_config(config_manager.config()) {
         Ok(mut generator) => {
             match generator.generate_code(prompt) {
                 Ok(code) => {
@@ -241,8 +237,7 @@ fn handle_fix_command(config_manager: &ConfigManager, _last_error: bool) {
     println!("   \x1b[32m{}\x1b[0m", suggestion);
 
     // 使用 LLM 生成修复命令
-    let model_path = config_manager.get_model_path();
-    match CommandGenerator::new(model_path.clone()) {
+    match CommandGenerator::from_config(config_manager.config()) {
         Ok(mut generator) => {
             match generator.fix_command(command, error) {
                 Ok(fixed_command) => {

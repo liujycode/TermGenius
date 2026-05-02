@@ -15,6 +15,9 @@ pub enum LLMError {
     #[error("推理失败: {0}")]
     InferenceError(String),
 
+    #[error("生成失败: {0}")]
+    GenerationError(String),
+
     #[error("配置错误: {0}")]
     ConfigError(String),
 

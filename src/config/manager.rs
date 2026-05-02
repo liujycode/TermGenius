@@ -132,6 +132,11 @@ impl ConfigManager {
         format!(
             r#"TermGenius 配置
 
+引擎:
+  类型: {}
+  API 地址: {}
+  模型名称: {}
+
 模型:
   路径: {}
   上下文大小: {}
@@ -154,6 +159,9 @@ UI:
   进度条: {}
 
 配置文件: {}"#,
+            self.config.model.engine_type,
+            self.config.model.api_url,
+            self.config.model.model_name,
             self.config.model.path.display(),
             self.config.model.context_size,
             self.config.model.gpu_layers,

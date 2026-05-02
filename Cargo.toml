@@ -17,8 +17,9 @@ clap = { version = "4.5", features = ["derive", "cargo"] }
 ratatui = "0.26"
 crossterm = "0.27"
 
-# LLM 推理 (暂时注释，使用模拟引擎)
-# llama-cpp-2 = "0.1.77"
+# LLM 推理 (使用 HTTP API 方式，支持 Ollama/llama.cpp server)
+# llama-cpp-2 = "0.1.77"  # 编译复杂，改用 HTTP API
+reqwest = { version = "0.12", features = ["json", "blocking"] }
 
 # 异步运行时
 tokio = { version = "1.36", features = ["full"] }

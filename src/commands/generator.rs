@@ -1,8 +1,8 @@
 //! 命令生成器
 
-use crate::llm::{LLMEngine, LLMConfig, Result as LLMResult};
+use crate::llm::{LLMEngine, MockLLMEngine, HttpLLMEngine, ApiType, LLMConfig, Result as LLMResult};
 use crate::commands::PromptBuilder;
-use std::path::PathBuf;
+use crate::config::Config;
 use tracing::{info, error};
 
 /// 命令生成器
@@ -12,15 +12,43 @@ pub struct CommandGenerator {
 }
 
 impl CommandGenerator {
-    /// 创建新的命令生成器
-    pub fn new(model_path: PathBuf) -> LLMResult<Self> {
+    /// 从配置创建命令生成器
+    pub fn from_config(config: &Config) -> LLMResult<Self> {
         info!("初始化命令生成器...");
+        info!("  引擎类型: {}", config.model.engine_type);
 
-        let config = LLMConfig::new(model_path)
-            .with_temperature(0.3)  // 降低温度，提高确定性
-            .with_max_tokens(256);  // 命令通常较短
+        let llm_config = LLMConfig::new(config.model.path.clone())
+            .with_temperature(config.model.temperature)
+            .with_max_tokens(config.model.max_tokens);
 
-        let engine = LLMEngine::new(config)?;
+        let engine = match config.model.engine_type.as_str() {
+            "ollama" => {
+                info!("  使用 Ollama API");
+                let http_engine = HttpLLMEngine::new(
+                    llm_config,
+                    config.model.api_url.clone(),
+                    config.model.model_name.clone(),
+                    ApiType::Ollama,
+                )?;
+                LLMEngine::Http(http_engine)
+            }
+            "llama_cpp" => {
+                info!("  使用 llama.cpp server API");
+                let http_engine = HttpLLMEngine::new(
+                    llm_config,
+                    config.model.api_url.clone(),
+                    config.model.model_name.clone(),
+                    ApiType::LlamaCpp,
+                )?;
+                LLMEngine::Http(http_engine)
+            }
+            "mock" | _ => {
+                info!("  使用模拟引擎");
+                let mock_engine = MockLLMEngine::new(llm_config)?;
+                LLMEngine::Mock(mock_engine)
+            }
+        };
+
         let prompt_builder = PromptBuilder::new();
 
         Ok(Self {

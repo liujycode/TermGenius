@@ -22,7 +22,19 @@ pub struct Config {
 /// 模型配置
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ModelConfig {
-    /// 模型文件路径
+    /// 引擎类型：mock, ollama, llama_cpp
+    #[serde(default = "default_engine_type")]
+    pub engine_type: String,
+
+    /// API 地址（用于 HTTP API 引擎）
+    #[serde(default = "default_api_url")]
+    pub api_url: String,
+
+    /// 模型名称（用于 HTTP API 引擎）
+    #[serde(default = "default_model_name")]
+    pub model_name: String,
+
+    /// 模型文件路径（用于本地引擎）
     pub path: PathBuf,
 
     /// 上下文大小
@@ -110,6 +122,9 @@ pub struct UiConfig {
 }
 
 // 默认值函数
+fn default_engine_type() -> String { "mock".to_string() }
+fn default_api_url() -> String { "http://localhost:11434".to_string() }
+fn default_model_name() -> String { "qwen2.5:1.5b".to_string() }
 fn default_context_size() -> usize { 2048 }
 fn default_temperature() -> f32 { 0.7 }
 fn default_top_p() -> f32 { 0.9 }
@@ -136,6 +151,9 @@ impl Default for Config {
 
         Self {
             model: ModelConfig {
+                engine_type: default_engine_type(),
+                api_url: default_api_url(),
+                model_name: default_model_name(),
                 path: config_dir.join("models").join("qwen1_5-1_8b-chat-q4_0.gguf"),
                 context_size: default_context_size(),
                 gpu_layers: 0,
